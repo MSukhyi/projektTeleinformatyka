@@ -1,7 +1,12 @@
 package com.example.r1kma.myapplication;
 
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,8 +27,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public RadioGroup radGroupTypKodow;
     public RadioButton parityRadButton, hammingRadButton, crcRadButton;
-    public EditText etDaneWejsc, etZakodow, etZakodowPoKorek, etDaneWyjsc, etZakloc;
-    public TextView tvPrzeslBityDanych, tvBityNadm, tvBledyWykr, tvBledySkoryg, tvBledyNiewykr;
+    public EditText etDaneWejsc, etZakodow,  etZakloc;
+    public TextView tvPrzeslBityDanych, tvBityNadm, tvBledyWykr, tvBledySkoryg, tvBledyNiewykr,etZakodowPoKorek, etDaneWyjsc;
     public Spinner spinRodzCRC;
     public ArrayAdapter<String> adapterRodzCRC;
     public List<String> listRodzCRC;
@@ -102,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         etDaneWejsc = (EditText) findViewById(R.id.etDaneWejsc);
         etZakodow = (EditText) findViewById(R.id.etZakodow);
-        etZakodowPoKorek = (EditText) findViewById(R.id.etZakodowPoKorek);
-        etDaneWyjsc = (EditText) findViewById(R.id.etDaneWyjsc);
+        etZakodowPoKorek = (TextView) findViewById(R.id.etZakodowPoKorek);
+        etDaneWyjsc = (TextView) findViewById(R.id.etDaneWyjsc);
         etZakloc = (EditText) findViewById(R.id.etZakloc);
 
         tvPrzeslBityDanych = (TextView) findViewById(R.id.tvPrzeslBityDanych);
@@ -192,8 +197,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 transmitter.setCode(etZakodow.getText().toString());
                 int errors = countErrors();
                 transmitter.fix();
-                etZakodowPoKorek.setText(transmitter.codeToString());
-                //colorFixedBits(transmitter.getBitTypes());
+
+
+                colorFixedBits(transmitter.getBitTypes());
+
                 transmitter.dekoduj();
                 etDaneWyjsc.setText(transmitter.dataToString());
 
@@ -229,6 +236,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (input.charAt(i) != output.charAt(i)) errors++;
             }
             return errors;
+        }
+    }
+    public void colorFixedBits(int type[])
+    {
+        String str=transmitter.codeToString();
+        if (str.length()==type.length)
+        {
+
+
+            SpannableString text = new SpannableString(str);
+
+            etZakodowPoKorek.setText("");
+            int l = type.length;
+
+
+            for (int i=0; i<l; i++)
+            {
+
+                switch (type[i])
+                {
+                    case 0:
+                        text.setSpan(new ForegroundColorSpan(Color.GREEN), i, i+1,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
+                    case 1:
+                        text.setSpan(new ForegroundColorSpan(Color.RED), i, i+1,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        break;
+                    case 2:
+                        text.setSpan(new ForegroundColorSpan(Color.argb(255,253,106,2)), i, i+1,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        break;
+                    case 3:
+                        text.setSpan(new ForegroundColorSpan(Color.CYAN), i, i+1,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                    case 4:
+                        text.setSpan(new ForegroundColorSpan(Color.MAGENTA), i, i+1,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        break;
+                    case 5:
+                        text.setSpan(new ForegroundColorSpan(Color.YELLOW), i, i+1,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        break;
+                }
+
+            }
+            etZakodowPoKorek.setText(text, TextView.BufferType.SPANNABLE);
+
         }
     }
 }
