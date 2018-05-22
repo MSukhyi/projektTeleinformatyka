@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 //NE PRACUJE KOLOROWANIE BITOW!!!!!!!!!!!!!!!!!!!!!!!
-//NE dobawlena enable/disable przciskow i pol -> koduje tilky "Bit parzystosci"
+
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public RadioGroup radGroupTypKodow;
@@ -52,13 +53,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         parityReceiver = new Parity();
         hammingReceiver = new Hamming();
         crcReceiver = new Crc();
+
+        //default
         transmitter = parityTransmitter;
         receiver = parityReceiver;
+
 
         radGroupTypKodow = (RadioGroup) findViewById(R.id.radGroupTypKodow);
         parityRadButton = (RadioButton) findViewById(R.id.parityRadButton);
         hammingRadButton = (RadioButton) findViewById(R.id.hammingRadButton);
         crcRadButton = (RadioButton) findViewById(R.id.crcRadButton);
+
+        radGroupTypKodow.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId) {
+                    case R.id.parityRadButton:
+
+                        transmitter = parityTransmitter;
+                        receiver = parityReceiver;
+                        spinRodzCRC.setEnabled(false);
+                        break;
+                    case R.id.hammingRadButton:
+                        transmitter = hammingTransmitter;
+                        receiver = hammingReceiver;
+                        spinRodzCRC.setEnabled(false);
+                        break;
+                    case R.id.crcRadButton:
+                        transmitter = crcTransmitter;
+                        receiver = crcReceiver;
+                        spinRodzCRC.setEnabled(true);
+                        break;
+                        default:
+                            break;
+                }
+            }
+
+        });
 
         spinRodzCRC = (Spinner) findViewById(R.id.spinRodzCRC);
         listRodzCRC = new ArrayList<String>();
@@ -68,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapterRodzCRC = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, listRodzCRC);
         adapterRodzCRC.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinRodzCRC.setAdapter(adapterRodzCRC);
+        spinRodzCRC.setEnabled(false);
 
         etDaneWejsc = (EditText) findViewById(R.id.etDaneWejsc);
         etZakodow = (EditText) findViewById(R.id.etZakodow);
@@ -91,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         listLiczbBit.add("48");
         listLiczbBit.add("56");
         listLiczbBit.add("64");
+
         adapterLiczbBit = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, listLiczbBit);
         adapterLiczbBit.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinLiczbBit.setAdapter(adapterLiczbBit);
@@ -106,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnWyczysc = (Button) findViewById(R.id.btnWyczysc);
         btnWyczysc.setOnClickListener(this);
     }
+
+
 
     @Override
     public void onClick(View view) {
@@ -127,6 +161,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     str = temp + str;
                     etDaneWejsc.setText(str);
                 }
+
+                if(transmitter == crcTransmitter) {
+                    String iteam = spinRodzCRC.getSelectedItem().toString();
+                    if (iteam == "CRC-12") {
+                       //Toast.makeText(MainActivity.this, "crc12", Toast.LENGTH_SHORT).show();
+                        crcTransmitter.setKey(Crc.CRC12);
+                        crcReceiver.setKey(Crc.CRC12);
+                    } else if (iteam == "CRC-16"){
+                        //Toast.makeText(MainActivity.this, "crc16", Toast.LENGTH_SHORT).show();
+                        crcTransmitter.setKey(Crc.CRC16);
+                        crcReceiver.setKey(Crc.CRC16);
+                    }else if(iteam == "CRC-32"){
+                        //Toast.makeText(MainActivity.this, "crc32", Toast.LENGTH_SHORT).show();
+                        crcTransmitter.setKey(Crc.CRC32);
+                        crcReceiver.setKey(Crc.CRC32);}else{
+                        //Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+                    }
+                }
                 transmitter.setData(str);
                 transmitter.koduj();
                 etZakodow.setText(transmitter.codeToString());
@@ -144,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //colorFixedBits(transmitter.getBitTypes());
                 transmitter.dekoduj();
                 etDaneWyjsc.setText(transmitter.dataToString());
+
                 tvPrzeslBityDanych.setText(Integer.toString(transmitter.getDataBitsNumber()));
                 tvBityNadm.setText(Integer.toString(transmitter.getControlBitsNumber()));
                 int detected = transmitter.getDetectedErrorsNumber();
