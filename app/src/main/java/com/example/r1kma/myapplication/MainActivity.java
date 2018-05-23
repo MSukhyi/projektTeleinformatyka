@@ -97,9 +97,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         spinRodzCRC = (Spinner) findViewById(R.id.spinRodzCRC);
         listRodzCRC = new ArrayList<String>();
+
         listRodzCRC.add("CRC-12");
         listRodzCRC.add("CRC-16");
         listRodzCRC.add("CRC-32");
+        listRodzCRC.add("ATM");
+
         adapterRodzCRC = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, listRodzCRC);
         adapterRodzCRC.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinRodzCRC.setAdapter(adapterRodzCRC);
@@ -180,7 +183,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }else if(iteam == "CRC-32"){
                         //Toast.makeText(MainActivity.this, "crc32", Toast.LENGTH_SHORT).show();
                         crcTransmitter.setKey(Crc.CRC32);
-                        crcReceiver.setKey(Crc.CRC32);}else{
+                        crcReceiver.setKey(Crc.CRC32);
+                    }else if(iteam == "ATM"){
+                        //Toast.makeText(MainActivity.this, "crc32", Toast.LENGTH_SHORT).show();
+                        crcTransmitter.setKey(Crc.ATM);
+                        crcReceiver.setKey(Crc.ATM);}else{
                         //Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
                     }
                 }
